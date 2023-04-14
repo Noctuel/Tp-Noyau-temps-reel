@@ -54,6 +54,7 @@
 
 /* USER CODE BEGIN PV */
 TaskHandle_t h_task_shell = NULL;
+TaskHandle_t h_task_overflow = NULL;
 TaskHandle_t h_task_led = NULL;
 TaskHandle_t h_task_Spam = NULL;
 
@@ -89,8 +90,36 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) // fonction weak de base
 	}
 }
 
-int fonction(int argc, char ** argv)
+int fonction(int argc, char ** argv){
+	int grostableau[STACK_SIZE];
+
+		for (int i = 0 ; i < STACK_SIZE ; i++)
+		{
+			grostableau[i] = i;
+			printf("%d\r\n", grostableau[i]);
+		}
+
+	return 0;
+}
+
+
+int variable_globale;			// Segment de données (visible dans tous les fichiers)
+static int variable_statique;	// Segment de données aussi (visible que dans le fichier)
+
+
+int fonction(int argc, char ** argv)//parametres passe dans la Pile
 {
+	int variable_locale;					// Pile (visible dans la fonction)
+	static int variable_locale_statique;	// Segment de données (visible dans la fonction)
+
+	int grostableau[STACK_SIZE];
+
+	for (int i = 0 ; i < STACK_SIZE ; i++)
+	{
+		grostableau[i] = i;
+		printf("%d\r\n", grostableau[i]);
+	}
+
 	printf("Je suis une fonction bidon\r\n");
 
 	printf("argc = %d\r\n", argc);
@@ -127,13 +156,6 @@ void Led_toggle (void * pvParameters) {
 	while (1) {
 		HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
 		vTaskDelay(duree);
-	}
-}
-
-void bidon (void * pvParameters) {
-
-	while (1) {
-		vTaskDelay(100);
 	}
 }
 
@@ -294,6 +316,12 @@ int main(void)
 	//		}
 	//	}
 
+
+	if (xTaskCreate(overflow, "Shell", TASK_SHELL_STACK_DEPTH, NULL, TASK_SHELL_PRIORITY, &h_task_overflow) != pdPASS)
+		{
+			printf("Error creating task overflow\r\n");
+			Error_Handler();
+		}
 	vTaskStartScheduler();
 	/* USER CODE END 2 */
 
