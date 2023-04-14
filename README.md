@@ -25,6 +25,7 @@ du TD sont rappelées ci-dessous :
 
 2. Est-ce géré par FreeRTOS ou la HAL ?
 	FreeRTOS
+3. 
 
 4. Notez la mémoire RAM et Flash utilisée,
 	RAM --> 5.83%
@@ -32,7 +33,9 @@ du TD sont rappelées ci-dessous :
 	
 6. Notez la nouvelle utilisation mémoire.
 	Elle n'a pas changé, et cela est normal car on utilise le tasen dynamisque alors que l'usage de la ram est en statique. 
-	
+
+5. 
+ 	
 7. On a augmenté la taille du tas à *10.
 
 8. Notez la nouvelle utilisation mémoire. Expliquez les trois relevés.
