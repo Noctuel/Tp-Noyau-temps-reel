@@ -75,9 +75,9 @@ void task1(void * pvParameters)
 
 	for(;;)
 	{
-		//xSemaphoreTake(sem, portMAX_DELAY);
+		xSemaphoreTake(sem, portMAX_DELAY);
 		printf("Je suis la tache 1 et je m'endors pour %d ticks\r\n", delay);
-		//xSemaphoreGive(sem);
+		xSemaphoreGive(sem);
 		vTaskDelay(delay);
 	}
 }
@@ -88,9 +88,9 @@ void task2(void * pvParameters)
 
 	for(;;)
 	{
-		//xSemaphoreTake(sem, portMAX_DELAY);
+		xSemaphoreTake(sem, portMAX_DELAY);
 		printf("Je suis la tache 2 et je m'endors pour %d ticks\r\n", delay);
-		//xSemaphoreGive(sem);
+		xSemaphoreGive(sem);
 		vTaskDelay(delay);
 	}
 }
