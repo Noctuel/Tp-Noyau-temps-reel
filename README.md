@@ -52,12 +52,19 @@ du TD sont rappelées ci-dessous :
 	
 
 3.3 Statistiques dans l'IDE	
-1. 
+1.  
+
 2. 
+ 
 3. 
+
 4. ![](images/im3.3.4.png)
+
 5. 
+
 6. 
+
 7. 
+
 8. Il faut d'abord donner un nom au sémaphore ou à la queue pour pouvoir l'afficher
 ![](images/im3.3.8.png)
