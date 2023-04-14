@@ -33,7 +33,7 @@ du TD sont rappelées ci-dessous :
 5. 
  		
 6. Notez la nouvelle utilisation mémoire.
-	Elle n'a pas changé, et cela est normal car on utilise le tasen dynamisque alors que l'usage de la ram est en statique. 
+	Elle n'a pas changé, et cela est normal car on utilise le tas en dynamique alors que l'usage de la ram est en statique. 
 
 7. On a augmenté la taille du tas à *10.
 
@@ -48,6 +48,12 @@ du TD sont rappelées ci-dessous :
 2. Dans CubeMX, configurez CHECK_FOR_STACK_OVERFLOW
 	On choisit l'option 2 pour attraper le plus d'overflow possible. L'option 1 ne permet que de vérifier si le pointeur est resté dans l'espace de la pile a la fin de l'exécution, mais si entre temps nous sommes sortis de la pile nous le le saurons jamais.
 	
-r
+4. Nous n'obtenons pas un overflow mais un HardFault_Handler ce qui signifie que l'on écrit plus loin que la mémoire. Notre pile doit se situer en bordure de la mémoire
 	
-		
+
+3.3 Statistiques dans l'IDE	
+
+4. ![](images/im3.3.4.png)
+
+8. Il faut d'abord donner un nom au sémaphore ou à la queue pour pouvoir l'afficher
+![](images/im3.3.8.png)

@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -58,6 +59,8 @@ TaskHandle_t h_task_overflow = NULL;
 TaskHandle_t h_task_led = NULL;
 TaskHandle_t h_task_Spam = NULL;
 
+SemaphoreHandle_t sem ;
+
 typedef struct{
 	char string[100] ;
 	int nbr;
@@ -90,19 +93,44 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) // fonction weak de base
 	}
 }
 
-int fonction(int argc, char ** argv){
-	int grostableau[STACK_SIZE];
-
-		for (int i = 0 ; i < STACK_SIZE ; i++)
-		{
-			grostableau[i] = i;
-			printf("%d\r\n", grostableau[i]);
-		}
-
-	return 0;
+//---------------------------------------------------------------------------------------------------------
+//Sémaphores
+void taskGive(void * unused){
+	int my_time=100;
+	for(;;){
+		printf("Give donne un semaphore\r\n");
+		xSemaphoreGive(sem);
+		printf("Give a donne un semaphore\r\n");
+		vTaskDelay(my_time);
+	}
 }
+void taskTake(void * unused){
+	for(;;){
+		printf("Take prend un semaphore\r\n");
+		BaseType_t error = xSemaphoreTake(sem, 1000);
+		if (error == 0)
+		{
+			printf("Timeout error\r\n");
+			NVIC_SystemReset();
+			//			Error_Handler();
+		}
+		printf("Take a pris un semaphore = %d\r\n", error);
+	}
+}
+//---------------------------------------------------------------------------------------------------------
+//Overflow
+void overflow(void * unused){
+	int grostableau[TASK_SHELL_STACK_DEPTH];
 
-
+	for (int i = 0 ; i < TASK_SHELL_STACK_DEPTH ; i++)
+	{
+		grostableau[i] = i;
+		printf("%d\r\n", grostableau[i]);
+	}
+	vTaskDelete(NULL);
+}
+//---------------------------------------------------------------------------------------------------------
+//SHELL
 int variable_globale;			// Segment de données (visible dans tous les fichiers)
 static int variable_statique;	// Segment de données aussi (visible que dans le fichier)
 
@@ -112,13 +140,6 @@ int fonction(int argc, char ** argv)//parametres passe dans la Pile
 	int variable_locale;					// Pile (visible dans la fonction)
 	static int variable_locale_statique;	// Segment de données (visible dans la fonction)
 
-	int grostableau[STACK_SIZE];
-
-	for (int i = 0 ; i < STACK_SIZE ; i++)
-	{
-		grostableau[i] = i;
-		printf("%d\r\n", grostableau[i]);
-	}
 
 	printf("Je suis une fonction bidon\r\n");
 
@@ -253,23 +274,29 @@ void task_shell(void * unused)
 	shell_add('s', spam, "Spam string nbr");
 	shell_run();	// boucle infinie
 }
+//---------------------------------------------------------------------------------------------------------
+void configureTimerForRunTimeStats(void)
+{
+	HAL_TIM_Base_Start(&htim2);
+}
+
+unsigned long getRunTimeCounterValue(void)
+{
+	return __HAL_TIM_GET_COUNTER(&htim2);
+}
+
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+	printf("je ne m'éxecute pas\r\n");
+}
+
+
 /* USER CODE END 0 */
 
 /**
  * @brief  The application entry point.
  * @retval int
  */
-
-
-void vApplicationStackOverflowHook( TaskHandle_t xTask, signed char *pcTaskName ){
-
-    (void)xTask;
-
-    // Afficher un message d'erreur avec le nom de la tâche qui a débordé de pile
-    printf("Overflow dans %s\r\n", pcTaskName);
-
-}
-
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
@@ -295,12 +322,26 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	MX_USART1_UART_Init();
+	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
+	DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_TIM6_STOP;
+
+	//	if (xTaskCreate(overflow, "ov", TASK_SHELL_STACK_DEPTH, NULL, TASK_SHELL_PRIORITY, &h_task_overflow) != pdPASS)
+	//	{
+	//			printf("Error creating task overflow\r\n");
+	//		Error_Handler();
+	//	}
+
 	if (xTaskCreate(task_shell, "Shell", TASK_SHELL_STACK_DEPTH, NULL, TASK_SHELL_PRIORITY, &h_task_shell) != pdPASS)
 	{
 		printf("Error creating task shell\r\n");
 		Error_Handler();
 	}
+
+	sem = xSemaphoreCreateBinary();
+	vQueueAddToRegistry(sem, "SemTest");
+	xTaskCreate(taskGive, "Give", 256, NULL, 5, NULL);
+	xTaskCreate(taskTake, "Take", 256, NULL, 4, NULL);
 
 	// Tache Bidon pour avoir une erreur
 	//
@@ -317,12 +358,9 @@ int main(void)
 	//	}
 
 
-	if (xTaskCreate(overflow, "Shell", TASK_SHELL_STACK_DEPTH, NULL, TASK_SHELL_PRIORITY, &h_task_overflow) != pdPASS)
-		{
-			printf("Error creating task overflow\r\n");
-			Error_Handler();
-		}
+
 	vTaskStartScheduler();
+
 	/* USER CODE END 2 */
 
 	/* Call init function for freertos objects (in freertos.c) */
