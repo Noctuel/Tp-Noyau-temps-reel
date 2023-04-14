@@ -52,13 +52,15 @@ du TD sont rappelées ci-dessous :
 	
 
 3.3 Statistiques dans l'IDE	
+
 1.  
 
 2. 
  
 3. 
 
-4. ![](images/im3.3.4.png)
+4. 
+![](images/im3.3.4.png)
 
 5. 
 
