@@ -67,6 +67,9 @@ typedef struct{
 	int tempo;
 } spam_msg_t;
 
+
+ char pcWriteBuffer[200];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,7 +99,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) // fonction weak de base
 //---------------------------------------------------------------------------------------------------------
 //Sémaphores
 void taskGive(void * unused){
-	int my_time=100;
+	int my_time=2000;
 	for(;;){
 		printf("Give donne un semaphore\r\n");
 		xSemaphoreGive(sem);
@@ -107,7 +110,7 @@ void taskGive(void * unused){
 void taskTake(void * unused){
 	for(;;){
 		printf("Take prend un semaphore\r\n");
-		BaseType_t error = xSemaphoreTake(sem, 1000);
+		BaseType_t error = xSemaphoreTake(sem, 5000);
 		if (error == 0)
 		{
 			printf("Timeout error\r\n");
@@ -265,6 +268,17 @@ int spam(int argc, char ** argv){
 	return 0;
 }
 
+int stat (int argc, char ** argv){
+
+	if(argc == 1){
+		vTaskGetRunTimeStats(pcWriteBuffer);
+		printf("%s\r\n",pcWriteBuffer);
+		vTaskList(pcWriteBuffer);
+		printf("%s\r\n",pcWriteBuffer);
+	}
+	return 0;
+}
+
 void task_shell(void * unused)
 {
 	shell_init();
@@ -272,9 +286,12 @@ void task_shell(void * unused)
 	shell_add('a', addition, "Effectue une somme");
 	shell_add('l', led, "Toggle led");
 	shell_add('s', spam, "Spam string nbr");
+	shell_add('t', stat, "Stat");
 	shell_run();	// boucle infinie
 }
 //---------------------------------------------------------------------------------------------------------
+
+
 void configureTimerForRunTimeStats(void)
 {
 	HAL_TIM_Base_Start(&htim2);

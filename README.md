@@ -49,7 +49,8 @@ du TD sont rappelées ci-dessous :
 	On choisit l'option 2 pour attraper le plus d'overflow possible. L'option 1 ne permet que de vérifier si le pointeur est resté dans l'espace de la pile a la fin de l'exécution, mais si entre temps nous sommes sortis de la pile nous le le saurons jamais.
 	
 4. Nous n'obtenons pas un overflow mais un HardFault_Handler ce qui signifie que l'on écrit plus loin que la mémoire. Notre pile doit se situer en bordure de la mémoire
-	
+semaine d'après :
+![](images/im3.2.4.png)	
 
 3.3 Statistiques dans l'IDE	
 
@@ -70,3 +71,21 @@ du TD sont rappelées ci-dessous :
 
 8. Il faut d'abord donner un nom au sémaphore ou à la queue pour pouvoir l'afficher
 ![](images/im3.3.8.png)
+
+
+3.4 Affichage des statistiques dans le shell
+![](images/im3.4.png)
+
+-------------------------------------------------------------------
+TD
+
+6.1 Ajout d'une structure
+
+1.      shell_func_list_size
+	print_buffer
+	shell_func_list
+	sem_uart_read
+
+2.
+
+
